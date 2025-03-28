@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -29,17 +28,63 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 	return token + postfix
 }
 
-func ExtractTo(destinationDir, mboxFpath string) error {
-	file, err := os.Open(mboxFpath)
+func ExtractWithoutCursor(file io.ReadCloser) error {
+	searchingPhrase := []byte("\r\n\r\nFrom ")
+	sequence := make(SequenceMap)
 
-	if err != nil {
-		return fmt.Errorf("error opening .mbox file: %v", err)
+	letters := make([]byte, 0)
+	buf := make([]byte, 4*Kb)
+
+	for {
+		n, err := file.Read(buf)
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			return fmt.Errorf("error reading file: %v", err)
+		}
+
+		buf = buf[:n]
+		letters = append(letters, buf...)
+
+		for {
+			if posEnding := bytes.Index(letters, searchingPhrase); posEnding > -1 {
+				posEnding += 4 // last [\r\n]+
+
+				filename := sequence.ToUnique(getLetterId(letters[:posEnding]), ".eml")
+				filepath := path.Join("destinationDir", filename)
+				filepath = "/dev/null"
+
+				if err := os.WriteFile(filepath, letters[:posEnding], 0644); err != nil {
+					return fmt.Errorf("error saving file: %v", err)
+				}
+
+				letters = letters[posEnding:]
+
+			} else {
+
+				break
+
+			}
+		}
 	}
 
-	defer file.Close()
+	if len(letters) > 0 {
+		filename := sequence.ToUnique(getLetterId(letters), ".eml")
+		filepath := path.Join("destinationDir", filename)
+		filepath = "/dev/null"
 
-	reader := bufio.NewReader(file)
+		if err := os.WriteFile(filepath, letters, 0644); err != nil {
+			return fmt.Errorf("error saving file: %v", err)
+		}
+	}
 
+	return nil
+}
+
+func ExtractWithCursor(file io.ReadCloser) error {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
 
@@ -48,7 +93,7 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 	buf := make([]byte, 4*Kb)
 
 	for {
-		n, err := reader.Read(buf)
+		n, err := file.Read(buf)
 
 		if err != nil {
 			if err == io.EOF {
@@ -66,10 +111,10 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 				posEnding += cursor + 4 // last [\r\n]+
 
 				filename := sequence.ToUnique(getLetterId(letters[:posEnding]), ".eml")
-				filepath := path.Join(destinationDir, filename)
+				filepath := path.Join("destinationDir", filename)
+				filepath = "/dev/null"
 
 				if err := os.WriteFile(filepath, letters[:posEnding], 0644); err != nil {
-					// log.Printf("error saving file: %v", err)
 					return fmt.Errorf("error saving file: %v", err)
 				}
 
@@ -87,10 +132,10 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 
 	if len(letters) > 0 {
 		filename := sequence.ToUnique(getLetterId(letters), ".eml")
-		filepath := path.Join(destinationDir, filename)
+		filepath := path.Join("destinationDir", filename)
+		filepath = "/dev/null"
 
 		if err := os.WriteFile(filepath, letters, 0644); err != nil {
-			// log.Printf("error saving file: %v", err)
 			return fmt.Errorf("error saving file: %v", err)
 		}
 	}
