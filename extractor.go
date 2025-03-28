@@ -28,15 +28,7 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 	return token + postfix
 }
 
-func ExtractTo(destinationDir, mboxFpath string) error {
-	file, err := os.Open(mboxFpath)
-
-	if err != nil {
-		return fmt.Errorf("error opening .mbox file: %v", err)
-	}
-
-	defer file.Close()
-
+func ExtractTo(destinationDir string, file io.ReadCloser) error {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
 
