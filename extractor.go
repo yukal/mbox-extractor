@@ -74,7 +74,7 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 				}
 
 				letters = letters[posEnding:]
-				lastPos = 0
+				lastPos = len(letters)
 
 			} else {
 
