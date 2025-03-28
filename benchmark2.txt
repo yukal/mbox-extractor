@@ -1,0 +1,13 @@
+BenchmarkExtract-4   	  255348	      6425 ns/op	    4457 B/op	       1 allocs/op
+BenchmarkExtract-4   	  253152	      7072 ns/op	    4460 B/op	       1 allocs/op
+BenchmarkExtract-4   	  159630	      8040 ns/op	    4673 B/op	       1 allocs/op
+BenchmarkExtract-4   	  216993	      6818 ns/op	    4521 B/op	       1 allocs/op
+BenchmarkExtract-4   	  281481	      4783 ns/op	    4423 B/op	       1 allocs/op
+BenchmarkExtract-4   	  266674	      4089 ns/op	    4441 B/op	       1 allocs/op
+BenchmarkExtract-4   	  266396	      4544 ns/op	    4442 B/op	       1 allocs/op
+BenchmarkExtract-4   	  320024	      5487 ns/op	    4384 B/op	       1 allocs/op
+BenchmarkExtract-4   	  349306	      6364 ns/op	    4360 B/op	       1 allocs/op
+BenchmarkExtract-4   	  222550	      4778 ns/op	    4510 B/op	       1 allocs/op
+
+PASS
+ok  	yu/mboxextractor	27.557s
