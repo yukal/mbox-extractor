@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -38,8 +37,6 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 
 	defer file.Close()
 
-	reader := bufio.NewReader(file)
-
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
 
@@ -48,7 +45,7 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 	buf := make([]byte, 4*Kb)
 
 	for {
-		n, err := reader.Read(buf)
+		n, err := file.Read(buf)
 
 		if err != nil {
 			if err == io.EOF {
