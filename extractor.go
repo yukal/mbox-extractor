@@ -22,7 +22,7 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 	} else {
 
 		s[token] = n + 1
-		token += "_" + strconv.Itoa(n)
+		token += "_" + strconv.Itoa(s[token])
 
 	}
 
