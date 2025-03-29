@@ -30,6 +30,7 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 
 func ExtractTo(destinationDir string, file io.ReadCloser) error {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
+	phraseLen := len(searchingPhrase)
 	sequence := make(SequenceMap)
 
 	cursor := 0
@@ -62,11 +63,21 @@ func ExtractTo(destinationDir string, file io.ReadCloser) error {
 				}
 
 				letters = letters[posEnding:]
+
 				cursor = len(letters)
+
+				if startFrom := cursor - phraseLen + 1; startFrom > 0 {
+					cursor = startFrom
+				}
 
 			} else {
 
 				cursor = len(letters)
+
+				if startFrom := cursor - phraseLen + 1; startFrom > 0 {
+					cursor = startFrom
+				}
+
 				break
 
 			}
