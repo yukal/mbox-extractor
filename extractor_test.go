@@ -7,6 +7,11 @@ import (
 	"yu/mboxextractor/data"
 )
 
+// Efficient File Reading in Go: Examples and Benchmark Comparisons
+// https://medium.com/@smart_byte_labs/efficient-file-reading-in-go-examples-and-benchmark-comparisons-2335b097431a
+// https://github.com/SmartByteLabs/filereadingexamples-go
+// https://pkg.go.dev/embed
+
 // https://blog.logrocket.com/benchmarking-golang-improve-function-performance/
 // https://www.linkedin.com/learning/go-performance-tuning-and-benchmarking/using-benchstat
 
