@@ -47,8 +47,7 @@ func ExtractTo(destinationDir string, file io.ReadCloser) error {
 			return fmt.Errorf("error reading file: %v", err)
 		}
 
-		buf = buf[:n]
-		letters = append(letters, buf...)
+		letters = append(letters, buf[:n]...)
 
 		for {
 			if posEnding := bytes.Index(letters[cursor:], searchingPhrase); posEnding > -1 {
