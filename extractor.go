@@ -48,8 +48,7 @@ func ExtractWithoutCursor(file io.ReadCloser) (int, error) {
 			return lettersCount, fmt.Errorf("error reading file: %v", err)
 		}
 
-		buf = buf[:n]
-		letters = append(letters, buf...)
+		letters = append(letters, buf[:n]...)
 
 		for {
 			if posEnding := bytes.Index(letters, searchingPhrase); posEnding > -1 {
@@ -108,7 +107,6 @@ func ExtractWithCursor(file io.ReadCloser) (int, error) {
 			return lettersCount, fmt.Errorf("error reading file: %v", err)
 		}
 
-		// buf = buf[:n]
 		letters = append(letters, buf[:n]...)
 
 		for {
