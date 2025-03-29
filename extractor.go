@@ -28,12 +28,14 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 	return token + postfix
 }
 
-func ExtractTo(destinationDir string, file io.ReadCloser) error {
+func ExtractTo(destinationDir string, file io.ReadCloser) (int, error) {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	phraseLen := len(searchingPhrase)
 	sequence := make(SequenceMap)
 
 	cursor := 0
+	lettersCount := 0
+
 	letters := make([]byte, 0)
 	buf := make([]byte, 4*Kb)
 
@@ -45,7 +47,7 @@ func ExtractTo(destinationDir string, file io.ReadCloser) error {
 				break
 			}
 
-			return fmt.Errorf("error reading file: %v", err)
+			return lettersCount, fmt.Errorf("error reading file: %v", err)
 		}
 
 		letters = append(letters, buf[:n]...)
@@ -59,9 +61,10 @@ func ExtractTo(destinationDir string, file io.ReadCloser) error {
 
 				if err := os.WriteFile(filepath, letters[:posEnding], 0644); err != nil {
 					// log.Printf("error saving file: %v", err)
-					return fmt.Errorf("error saving file: %v", err)
+					return lettersCount, fmt.Errorf("error saving file: %v", err)
 				}
 
+				lettersCount++
 				letters = letters[posEnding:]
 
 				cursor = len(letters)
@@ -90,11 +93,13 @@ func ExtractTo(destinationDir string, file io.ReadCloser) error {
 
 		if err := os.WriteFile(filepath, letters, 0644); err != nil {
 			// log.Printf("error saving file: %v", err)
-			return fmt.Errorf("error saving file: %v", err)
+			return lettersCount, fmt.Errorf("error saving file: %v", err)
 		}
+
+		lettersCount++
 	}
 
-	return nil
+	return lettersCount, nil
 }
 
 func getLetterId(message []byte) string {
