@@ -1,8 +1,10 @@
 package main
 
 import (
-	"os"
+	"io"
+	"io/fs"
 	"testing"
+	"yu/mboxextractor/data"
 )
 
 // https://blog.logrocket.com/benchmarking-golang-improve-function-performance/
@@ -18,28 +20,40 @@ import (
 // go test -bench BenchmarkExtract -count 10 |& tee /tmp/benchmark1
 // go test -benchmem -bench BenchmarkExtract -count 10 |& tee /tmp/benchmark1
 
-func BenchmarkExtract(b *testing.B) {
-	const mboxFile = "letters.mbox"
+var (
+	result int
+	n      int
+)
 
+func BenchmarkExtract(b *testing.B) {
 	var (
-		file *os.File
-		err  error
+		fileName = "22M.mbox"
+		file     fs.File
+		err      error
 	)
 
-	if file, err = os.Open(mboxFile); err != nil {
+	if file, err = data.Files.Open(fileName); err != nil {
 		b.Fatalf("error opening .mbox file: %v", err)
 	}
 	defer file.Close()
 
-	// for i := 0; i < b.N; i++ {
-	// 	if err := ExtractWithoutCursor(file); err != nil {
-	// 		b.Error(err)
-	// 	}
-	// }
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		if err := ExtractWithCursor(file); err != nil {
-			b.Fatal(err)
+		if n, err = ExtractWithoutCursor(file); err != nil {
+			b.Error(err)
+		}
+
+		// if n, err = ExtractWithCursor(file); err != nil {
+		// 	b.Error(err)
+		// }
+
+		// Store the result to prevent the compiler optimizations
+		result = n
+
+		// Reset the file pointer
+		if _, err := file.(io.Seeker).Seek(0, io.SeekStart); err != nil {
+			b.Fatalf("Failed to reset %s file pointer: %v", fileName, err)
 		}
 	}
 }

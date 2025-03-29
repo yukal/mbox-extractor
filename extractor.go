@@ -28,9 +28,11 @@ func (s SequenceMap) ToUnique(token, postfix string) string {
 	return token + postfix
 }
 
-func ExtractWithoutCursor(file io.ReadCloser) error {
+func ExtractWithoutCursor(file io.ReadCloser) (int, error) {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
+
+	lettersCount := 0
 
 	letters := make([]byte, 0)
 	buf := make([]byte, 4*Kb)
@@ -43,7 +45,7 @@ func ExtractWithoutCursor(file io.ReadCloser) error {
 				break
 			}
 
-			return fmt.Errorf("error reading file: %v", err)
+			return lettersCount, fmt.Errorf("error reading file: %v", err)
 		}
 
 		buf = buf[:n]
@@ -58,9 +60,10 @@ func ExtractWithoutCursor(file io.ReadCloser) error {
 				filepath = "/dev/null"
 
 				if err := os.WriteFile(filepath, letters[:posEnding], 0644); err != nil {
-					return fmt.Errorf("error saving file: %v", err)
+					return lettersCount, fmt.Errorf("error saving file: %v", err)
 				}
 
+				lettersCount++
 				letters = letters[posEnding:]
 
 			} else {
@@ -77,18 +80,20 @@ func ExtractWithoutCursor(file io.ReadCloser) error {
 		filepath = "/dev/null"
 
 		if err := os.WriteFile(filepath, letters, 0644); err != nil {
-			return fmt.Errorf("error saving file: %v", err)
+			return lettersCount, fmt.Errorf("error saving file: %v", err)
 		}
 	}
 
-	return nil
+	return lettersCount, nil
 }
 
-func ExtractWithCursor(file io.ReadCloser) error {
+func ExtractWithCursor(file io.ReadCloser) (int, error) {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
 
 	cursor := 0
+	lettersCount := 0
+
 	letters := make([]byte, 0)
 	buf := make([]byte, 4*Kb)
 
@@ -100,11 +105,11 @@ func ExtractWithCursor(file io.ReadCloser) error {
 				break
 			}
 
-			return fmt.Errorf("error reading file: %v", err)
+			return lettersCount, fmt.Errorf("error reading file: %v", err)
 		}
 
-		buf = buf[:n]
-		letters = append(letters, buf...)
+		// buf = buf[:n]
+		letters = append(letters, buf[:n]...)
 
 		for {
 			if posEnding := bytes.Index(letters[cursor:], searchingPhrase); posEnding > -1 {
@@ -115,9 +120,10 @@ func ExtractWithCursor(file io.ReadCloser) error {
 				filepath = "/dev/null"
 
 				if err := os.WriteFile(filepath, letters[:posEnding], 0644); err != nil {
-					return fmt.Errorf("error saving file: %v", err)
+					return lettersCount, fmt.Errorf("error saving file: %v", err)
 				}
 
+				lettersCount++
 				letters = letters[posEnding:]
 				cursor = len(letters)
 
@@ -136,11 +142,11 @@ func ExtractWithCursor(file io.ReadCloser) error {
 		filepath = "/dev/null"
 
 		if err := os.WriteFile(filepath, letters, 0644); err != nil {
-			return fmt.Errorf("error saving file: %v", err)
+			return lettersCount, fmt.Errorf("error saving file: %v", err)
 		}
 	}
 
-	return nil
+	return lettersCount, nil
 }
 
 func getLetterId(message []byte) string {
