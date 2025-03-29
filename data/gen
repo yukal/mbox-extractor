@@ -1,0 +1,17 @@
+#!/bin/bash
+
+touch 100M.mbox
+touch 500M.mbox
+touch 1G.mbox
+
+for i in {1..5}; do
+   cat 22M.mbox >> 100M.mbox
+done
+
+for i in {1..23}; do
+   cat 22M.mbox >> 500M.mbox
+done
+
+for i in {1..46}; do
+   cat 22M.mbox >> 1G.mbox
+done
