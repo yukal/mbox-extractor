@@ -12,6 +12,6 @@ for i in {1..23}; do
    cat 22M.mbox >> 500M.mbox
 done
 
-for i in {1..46}; do
+for i in {1..47}; do
    cat 22M.mbox >> 1G.mbox
 done
