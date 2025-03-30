@@ -43,7 +43,7 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 	searchingPhrase := []byte("\r\n\r\nFrom ")
 	sequence := make(SequenceMap)
 
-	cursor := 0
+	lastPos := 0
 	letters := make([]byte, 0)
 	buf := make([]byte, 4*Kb)
 
@@ -62,8 +62,8 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 		letters = append(letters, buf...)
 
 		for {
-			if posEnding := bytes.Index(letters[cursor:], searchingPhrase); posEnding > -1 {
-				posEnding += cursor + 4 // last [\r\n]+
+			if posEnding := bytes.Index(letters[lastPos:], searchingPhrase); posEnding > -1 {
+				posEnding += lastPos + 4 // last [\r\n]+
 
 				filename := sequence.ToUnique(getLetterId(letters[:posEnding]), ".eml")
 				filepath := path.Join(destinationDir, filename)
@@ -74,11 +74,11 @@ func ExtractTo(destinationDir, mboxFpath string) error {
 				}
 
 				letters = letters[posEnding:]
-				cursor = len(letters)
+				lastPos = 0
 
 			} else {
 
-				cursor = len(letters)
+				lastPos = len(letters)
 				break
 
 			}
